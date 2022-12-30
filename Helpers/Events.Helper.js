@@ -1,15 +1,19 @@
 const amqp = require('amqplib');
 
 class RabbitMQ {
-  constructor(queueName, options = {}) {
+  constructor(queueName) {
     this.queueName = queueName;
-    this.options = options;
+    this.options = {
+            messageTtl: 1800000,  // 30 minutes in milliseconds
+            durable: true,
+            autoDelete: true
+          };
   }
 
   async connect(url) {
     if (!this.connection) {
       try {
-        this.connection = await amqp.connect(url);
+        this.connection = await amqp.connect(process.env.AMQP_URL);
         this.channel = await this.connection.createChannel();
       } catch (error) {
         console.error('Error connecting to RabbitMQ:', error);
