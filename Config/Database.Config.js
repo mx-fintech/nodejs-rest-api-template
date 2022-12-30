@@ -2,28 +2,36 @@ const mysql = require('mysql');
 const redis = require('redis');
 
 class Database {
-  constructor(mysqlConfig, redisConfig) {
+  constructor() {
     this.mysqlConfig = {
-        connectionLimit:1000,
-        host    : process.env.MYSQL_HOST,
-        user    : process.env.MYSQL_USER,
+        connectionLimit: 1000,
+        host: process.env.MYSQL_HOST,
+        user: process.env.MYSQL_USER,
         password: process.env.MYSQL_PASS,
-        port    : process.env.MYSQL_PORT,
+        port: process.env.MYSQL_PORT,
         database: process.env.MYSQL_NAME,
         multipleStatements: true,
-        ssl:true
+        ssl: true,
     };
     this.redisConfig = {
-        url: process.env.REDIS_URL 
+        url: process.env.REDIS_URL,
     };
+    this.mysqlConnection = null;
+    this.redisConnection = null;
   }
 
   getMySQLConnection() {
-    return mysql.createPool(this.mysqlConfig);
+    if (!this.mysqlConnection) {
+      this.mysqlConnection = mysql.createPool(this.mysqlConfig);
+    }
+    return this.mysqlConnection;
   }
 
   getRedisConnection() {
-    return redis.createClient(this.redisConfig);
+    if (!this.redisConnection) {
+      this.redisConnection = redis.createClient(this.redisConfig);
+    }
+    return this.redisConnection;
   }
 }
 
